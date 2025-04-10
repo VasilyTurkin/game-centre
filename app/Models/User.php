@@ -2,59 +2,90 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
+use App\Exception\DepositLimitException;
+use App\Exception\FundsDepositException;
 
-class User extends Authenticatable
+class User
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    const MAX_DEPOSIT = 10000;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    private int $user_id;
+    private string $login;
+    private string $email;
+    private string $userName;
+    private string $passwordHash;
+    private int $deposit;
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function __construct(array $userData)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $this->user_id = $userData['user_id'];
+        $this->login = $userData['login'];
+        $this->email = $userData['email'];
+        $this->userName = $userData['userName'];
+        $this->passwordHash = $userData['password'];
+        $this->deposit = $userData['deposit'];
+    }
+
+    public function cancelBooking(Booking $booking): void
+    {
+        $booking->cancel();
     }
 
     /**
-     * Get the user's initials
+     * @throws DepositLimitException
      */
-    public function initials(): string
+    public function addDeposit(int $amount): void
     {
-        return Str::of($this->name)
-            ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
-            ->implode('');
+        $limit = self::MAX_DEPOSIT - $this->deposit;
+
+        if ($amount > $limit) {
+            throw new DepositLimitException($limit);
+        }
+
+        $this->deposit += $amount;
+        echo "Депозит пополнен. Сумма депозита: $this->deposit" . PHP_EOL;
+    }
+
+    /**
+     * @throws FundsDepositException
+     */
+    public function pay(int $amount): void
+    {
+        if ($this->deposit < $amount) {
+            throw new FundsDepositException();
+        }
+
+        $this->deposit = $this->deposit - $amount;
+        echo "Оплата прошла успешно. Остаток на депозите: $this->deposit" . PHP_EOL;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->user_id;
+    }
+
+    public function getLogin(): string
+    {
+        return $this->login;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getName(): string
+    {
+        return $this->userName;
+    }
+
+    public function getPasswordHash(): string
+    {
+        return $this->passwordHash;
+    }
+
+    public function getDeposit(): int
+    {
+        return $this->deposit;
     }
 }
