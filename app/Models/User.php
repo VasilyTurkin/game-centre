@@ -2,29 +2,52 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use App\Exception\DepositLimitException;
 use App\Exception\FundsDepositException;
 
-class User
+/**
+ * @property int $deposit
+ */
+class User extends Model
 {
     const MAX_DEPOSIT = 10000;
 
-    private int $user_id;
-    private string $login;
-    private string $email;
-    private string $userName;
-    private string $passwordHash;
-    private int $deposit;
+    /**
+     * Db connection
+     *
+     * @var string
+     */
+    protected $connection = 'mysql';
 
-    public function __construct(array $userData)
-    {
-        $this->user_id = $userData['user_id'];
-        $this->login = $userData['login'];
-        $this->email = $userData['email'];
-        $this->userName = $userData['userName'];
-        $this->passwordHash = $userData['password'];
-        $this->deposit = $userData['deposit'];
-    }
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'login',
+        'email',
+        'userName',
+        'password',
+        'deposit'
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+    ];
 
     public function cancelBooking(Booking $booking): void
     {
@@ -43,6 +66,8 @@ class User
         }
 
         $this->deposit += $amount;
+        $this->save();
+
         echo "Депозит пополнен. Сумма депозита: $this->deposit" . PHP_EOL;
     }
 
@@ -55,37 +80,9 @@ class User
             throw new FundsDepositException();
         }
 
-        $this->deposit = $this->deposit - $amount;
+        $this->deposit -= $amount;
+        $this->save();
+
         echo "Оплата прошла успешно. Остаток на депозите: $this->deposit" . PHP_EOL;
-    }
-
-    public function getUserId(): int
-    {
-        return $this->user_id;
-    }
-
-    public function getLogin(): string
-    {
-        return $this->login;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function getName(): string
-    {
-        return $this->userName;
-    }
-
-    public function getPasswordHash(): string
-    {
-        return $this->passwordHash;
-    }
-
-    public function getDeposit(): int
-    {
-        return $this->deposit;
     }
 }
