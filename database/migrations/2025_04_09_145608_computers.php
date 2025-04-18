@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name')->unique();
             $table->integer('price');
-            $table->string('specs');
+            $table->string('specs');// ?text
             $table->timestamps();
         });
     }

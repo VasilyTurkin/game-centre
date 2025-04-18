@@ -2,43 +2,55 @@
 
 namespace App\Models;
 
-class Computer
+use DateTime;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $price
+ * @property string $specs
+ * @property DateTime $created_at
+ * @property DateTime $updated_at
+ */
+class Computer extends Model
 {
-    private int $id;
-    private string $name;
-    private int $price;
-    private string $specs;
+    /** @use HasFactory<\Database\Factories\ComputerFactory> */
+    use HasFactory;
 
-    public function __construct(array $computerData)
-    {
-        $this->id = $computerData['id'];
-        $this->name = $computerData['name'];
-        $this->price = $computerData['price'];
-        $this->specs = $computerData['specs'];
-    }
+    /**
+     * Db connection
+     *
+     * @var string
+     */
+    protected $connection = 'mysql';
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'computers';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'price',
+        'specs'
+    ];
+    /**
+     * Вычислить цену аренды компьютера за заданную длительность.
+     *
+     * @param int|string $duration
+     * @return int
+     */
     public function calculatePrice(int|string $duration): int
     {
-        return $this->getComputerPrice() * $duration;
-    }
-
-    public function getComputerId(): int
-    {
-        return $this->id;
-    }
-
-    public function getComputerName(): string
-    {
-        return $this->name;
-    }
-
-    public function getComputerPrice(): int
-    {
-        return $this->price;
-    }
-
-    public function getComputerSpecs(): string
-    {
-        return $this->specs;
+        return $this->price * (int)$duration;
     }
 }

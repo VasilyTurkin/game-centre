@@ -2,15 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Exception\DepositLimitException;
 use App\Exception\FundsDepositException;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 /**
  * @property int $deposit
  */
-class User extends Model
+class User extends Authenticatable
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+
     const MAX_DEPOSIT = 10000;
 
     /**
@@ -33,23 +39,30 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'login',
+        'name',
         'email',
-        'userName',
-        'password',
         'deposit'
     ];
 
     /**
-     * The attributes that should be hidden for arrays.
+     * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
-    public function cancelBooking(Booking $booking): void
+    public function initials(): string
+    {
+        return Str::of($this->name)
+            ->explode(' ')
+            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->implode('');
+    }
+
+    public function cancelBooking(BookingOld $booking): void
     {
         $booking->cancel();
     }
