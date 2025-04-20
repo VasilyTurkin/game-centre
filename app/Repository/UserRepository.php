@@ -3,53 +3,75 @@
 namespace App\Repository;
 
 use App\Models\User;
+use App\Exceptions\UserCheckExistsException;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class UserRepository
 {
+    /**
+     * @param string $email
+     * @return bool
+     */
     public function checkUserByEmail(string $email): bool
     {
-        $query = 'SELECT * FROM user WHERE email = :email LIMIT 1';
-        $checkQuery = $this->pdo->prepare($query);
-        $checkQuery->bindParam(':email', $email);
-        $checkQuery->execute();
-
-        return (bool)$checkQuery->fetch();
-    }
-
-    public function getUserById(int $id): User
-    {
-        $query = 'SELECT * FROM user WHERE id = :id LIMIT 1';
-        $checkQuery = $this->pdo->prepare($query);
-        $checkQuery->bindParam(':id', $id);
-        $checkQuery->execute();
-
-        $user = $checkQuery->fetch(PDO::FETCH_ASSOC);
-
-        return new User($user);
+        return (new User)->where('email', $email)->exists();
     }
 
     /**
+     * @param int $id
+     * @return User
      * @throws Exception
      */
-    public function saveUser(User $user): void
+    public function getUserById(int $id): User
     {
-        $login = $user->getLogin();
-        $email = $user->getEmail();
-        $passwordHash = $user->getPasswordHash();
-        $username = $user->getName();
-        $deposit = $user->getDeposit();
+        $user = (new User)->find($id);
 
-        $query = 'INSERT INTO user(login, email, password_hash, username, deposit)
-                    VALUES (:login, :email, :password_hash, :username, :deposit)';
-        $insertUser = $this->pdo->prepare($query);
+        if (!$user) {
+            throw new Exception("Пользователь с ID $id не найден");
+        }
 
-        $insertUser->bindParam(':login', $login);
-        $insertUser->bindParam(':email', $email);
-        $insertUser->bindParam(':password_hash', $passwordHash);
-        $insertUser->bindParam(':username', $username);
-        $insertUser->bindParam(':deposit', $deposit);
+        return $user;
+    }
 
-        $insertUser->execute();
+    /**
+     * @param array $userData
+     * @return User
+     * @throws UserCheckExistsException
+     * @throws Exception
+     */
+    public function saveUser(array $userData): User
+    {
+        try {
+            if ($this->checkUserByEmail($userData['email'])) {
+                throw new UserCheckExistsException('Пользователь с таким email уже существует');
+            }
+
+            return (new User)->create([
+                'name' => $userData['username'] ?? $userData['login'],
+                'email' => $userData['email'],
+                'password' => $userData['password_hash'] ?? $userData['password'],
+                'deposit' => $userData['deposit'] ?? 0,
+            ]);
+
+        } catch (UserCheckExistsException $e) {
+            Log::error('Ошибка сохранения пользователя: ' . $e->getMessage());
+            throw $e;
+
+        } catch (Exception $e) {
+            Log::error('Неожиданная ошибка при сохранении пользователя: ' . $e->getMessage());
+            throw new Exception("Ошибка при сохранении пользователя: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * @param User $user
+     * @param float $amount
+     * @return void
+     */
+    public function updateDeposit(User $user, float $amount): void
+    {
+        $user->deposit = $amount;
+        $user->save();
     }
 }

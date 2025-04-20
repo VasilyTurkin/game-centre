@@ -48,7 +48,6 @@ class BookingService
             throw new ComputerNotAvailableException();
         }
 
-        // Рассчитываем общую стоимость
         $amount = collect($computers)->sum(function (Computer $computer) use ($duration) {
             return $computer->calculatePrice($duration);
         });

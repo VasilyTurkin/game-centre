@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Log;
 class UserService
 {
     /**
-     *Create new User
-     *
      * @param array $userData
      * @return User
      * @throws UserCheckExistsException

@@ -44,7 +44,7 @@ class Computer extends Model
         'specs'
     ];
     /**
-     * Вычислить цену аренды компьютера за заданную длительность.
+     * Calculate price for  booking computers
      *
      * @param int|string $duration
      * @return int
