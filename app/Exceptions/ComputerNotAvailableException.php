@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Exceptions;
+
+use Exception;
+use Throwable;
+
+class ComputerNotAvailableException extends Exception
+{
+    public function __construct(string $message = "Один или несколько компьютеров заняты на указанный период",
+                                int $code = 0, ?Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+}

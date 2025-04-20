@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exception\UserCheckExistsException;
+use App\Exceptions\UserCheckExistsException;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class UserService
 {
     /**
-     * Создает нового пользователя
+     *Create new User
      *
      * @param array $userData
      * @return User

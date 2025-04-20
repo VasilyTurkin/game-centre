@@ -24,6 +24,6 @@ class ComputerRepository
 
     public function findById(int $id): ?Computer
     {
-        return Computer::find($id);
+        return (new Computer)->find($id);
     }
 }

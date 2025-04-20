@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Exception\DepositLimitException;
-use App\Exception\FundsDepositException;
+use App\Exceptions\DepositLimitException;
+use App\Exceptions\FundsDepositException;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
@@ -62,7 +62,7 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function cancelBooking(BookingOld $booking): void
+    public function cancelBooking(Booking $booking): void
     {
         $booking->cancel();
     }
