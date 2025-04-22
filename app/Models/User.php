@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Exceptions\DepositLimitException;
 use App\Exceptions\FundsDepositException;
@@ -11,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
 /**
+ * // Описать поля
  * @property int $deposit
  */
 class User extends Authenticatable
@@ -59,7 +61,7 @@ class User extends Authenticatable
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 
@@ -81,8 +83,6 @@ class User extends Authenticatable
 
         $this->deposit += $amount;
         $this->save();
-
-        echo "Депозит пополнен. Сумма депозита: $this->deposit" . PHP_EOL;
     }
 
     /**
@@ -96,7 +96,10 @@ class User extends Authenticatable
 
         $this->deposit -= $amount;
         $this->save();
+    }
 
-        echo "Оплата прошла успешно. Остаток на депозите: $this->deposit" . PHP_EOL;
+    public function bookings():HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
 }

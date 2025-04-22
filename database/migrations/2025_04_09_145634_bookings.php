@@ -16,7 +16,9 @@ return new class extends Migration {
             $table->dateTime('start_time');
             $table->dateTime('end_time');
             $table->enum('status', ['confirmed','canceled']);
-            $table->decimal('totalPrice',10,2);
+
+
+            $table->decimal('total_price',10,2);// на интежер  в копейках
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();

@@ -17,7 +17,9 @@ class ComputerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->unique()->name(),
+            'price' => fake()->randomFloat(2,100,200),
+            'specs' =>fake()->sentence,
         ];
     }
 }

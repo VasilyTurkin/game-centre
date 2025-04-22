@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use InvalidArgumentException;
 use Carbon\Carbon;
 
+/**
+ * @property string $status
+ */
 class Booking extends Model
 {
+    use HasFactory;
+
     const STATUS_CONFIRMED = 'confirmed';
     const STATUS_CANCELED = 'canceled';
 
@@ -17,7 +23,7 @@ class Booking extends Model
         'user_id',
         'start_time',
         'end_time',
-        'total_price',
+        'totalPrice',
         'status',
     ];
 
@@ -79,8 +85,7 @@ class Booking extends Model
      */
     public function computers(): BelongsToMany
     {
-        return $this->belongsToMany(Computer::class)
-            ->withTimestamps();
+        return $this->belongsToMany(Computer::class, 'booking_computer');
     }
 
     /**

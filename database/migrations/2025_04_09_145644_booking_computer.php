@@ -15,6 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('booking_id');
             $table->unsignedBigInteger('computer_id');
             $table->primary(['booking_id', 'computer_id']);
+            $table->timestamps();
 
             $table->foreign('booking_id')->references('id')->on('bookings')->cascadeOnDelete();
             $table->foreign('computer_id')->references('id')->on('computers')->cascadeOnDelete();

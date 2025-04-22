@@ -49,7 +49,7 @@ class Computer extends Model
      * @param int|string $duration
      * @return int
      */
-    public function calculatePrice(int|string $duration): int
+    public function calculatePrice(int $duration): int
     {
         return $this->price * (int)$duration;
     }
