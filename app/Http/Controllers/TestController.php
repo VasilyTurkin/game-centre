@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Repository\ComputerRepository;
 
 class TestController extends Controller
@@ -15,8 +16,16 @@ class TestController extends Controller
 
     public function index(): void
     {
-        $computers = $this->computerRepository->findById(1);
+//        $userId = User::where('id', 43)->first();
+//        dd($userId);
 
-        dd($computers);
+//        $users = User::all();
+//        dd($users);
+
+        $deposit = User::where('deposit', '>', 1000)
+        ->orderBy('name')->take(10)->get();
+
+        dd($deposit);
+
     }
 }

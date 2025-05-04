@@ -11,6 +11,7 @@ use Carbon\Carbon;
 
 /**
  * @property string $status
+ * @method static create(array $array)
  */
 class Booking extends Model
 {
